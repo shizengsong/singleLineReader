@@ -99,10 +99,10 @@ return
 		gosub,向下测量
 		gosub,下翻页
 		blockinput,mousemove
-		mousemove,% A_ScreenWidth/2,% 鼠标位移上线,2
-		sleep,50
+		mousemove,% x,% 鼠标位移上线,2
+		sleep,100
 		GuiControl,单行阅读器_按ESC退出:,分割线,*w%图像长度% *h-1 分割线.png
-		sleep,200
+		sleep,100
 		blockinput,mousemoveoff
 	}
 return
