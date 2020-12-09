@@ -7,6 +7,11 @@ try{
 }
 
 ;书籍路径:="Z:\书籍\查拉斯图拉如是说.TXT"
+
+文字大小:=50
+文本颜色:=303050
+字体:= "华文细黑"
+
 最长显示:=24
 最优显示区间_长:=15
 最优显示区间_短:=10
@@ -29,10 +34,11 @@ if(读取的位置){
 
 显示窗口:
 
-Gui,单行阅读器_按esc退出:new
-gui,单行阅读器_按esc退出:color,ffffff
+Gui,单行阅读器_按ESC退出:new
+gui,单行阅读器_按ESC退出:color,ffffff
 
-gui,font,s50 c303050,华文细黑
+gui,font,s%文字大小% c%文本颜色%,%字体%
+
 阅读文本宽度:=A_ScreenWidth*0.95
 阅读文本高度:=200
 坐标x:=A_ScreenWidth*0.05 , 坐标y:=A_ScreenHeight/2-阅读文本高度
@@ -40,11 +46,12 @@ gui,add,text,x%坐标x% y%坐标y% h%阅读文本高度% w%阅读文本宽度% v
 
 图像长度:=500
 坐标x:=(A_ScreenWidth-图像长度)/2 , 增加坐标y:=阅读文本高度-20
-gui,add,picture,x%坐标x% yp+%增加坐标y% w%图像长度% h-1,分割线.png
+gui,add,picture,v分割线 x%坐标x% yp+%增加坐标y% w%图像长度% h-1,分割线.png
 
-Gui,show,Maximize,单行阅读器_按esc退出
+;GuiControl,, 分割线,分割线_2.png
+Gui,show,Maximize,单行阅读器_按ESC退出
 鼠标位移下线:=A_ScreenHeight/2
-鼠标位移上线:=A_ScreenHeight/2-10
+鼠标位移上线:=A_ScreenHeight/2-2
 
 if(!内存文件)
 	return
@@ -52,7 +59,8 @@ if(!内存文件)
 gosub,向下测量
 gosub,下翻页
 
-开始监测:=0
+开启监测:=1
+
 是否开启鼠标监测(开启监测)
 
 是否开启鼠标监测(是否){
@@ -64,8 +72,7 @@ gosub,下翻页
 	}
 }
 
-
-#ifwinactive 单行阅读器_按esc退出
+#ifwinactive 单行阅读器_按ESC退出
 esc::gosub,退出
 up::gosub,上翻页
 down::
@@ -74,6 +81,7 @@ gosub,下翻页
 return
 
 rctrl::
+		
 if(!内存文件)
 	return
 是否开启鼠标监测(开启监测:=!开启监测)
@@ -81,22 +89,25 @@ return
 
 鼠标位移翻页:
 	wingettitle,活动窗口名,A
-	if(活动窗口名!="单行阅读器_按esc退出"){
+	if(活动窗口名!="单行阅读器_按ESC退出"){
 		是否开启鼠标监测(开启监测:=0)
 		return
 	}
 	mousegetpos,x,y
 	if( y>鼠标位移下线){
+		GuiControl,单行阅读器_按ESC退出:,分割线,*w%图像长度% *h-1 分割线_2.png
 		gosub,向下测量
 		gosub,下翻页
 		blockinput,mousemove
 		mousemove,% A_ScreenWidth/2,% 鼠标位移上线,2
-		sleep,150
+		sleep,50
+		GuiControl,单行阅读器_按ESC退出:,分割线,*w%图像长度% *h-1 分割线.png
+		sleep,200
 		blockinput,mousemoveoff
 	}
 return
 
-;#ifwinexist,单行阅读器_按esc退出
+;#ifwinexist,单行阅读器_按ESC退出
 
 上翻页:
 	if(!内存文件)
@@ -107,22 +118,22 @@ return
 			已下翻:=0
 		}else 段数--
 		显示字串:=阅读字串(段数)
-		ControlSetText,%阅读显示%,%显示字串%,单行阅读器_按esc退出
+		ControlSetText,%阅读显示%,%显示字串%,单行阅读器_按ESC退出
 		已上翻:=1
 	}
 return
 
 下翻页:
-if(!内存文件)
-	return
-if(已上翻){
+	if(!内存文件)
+		return
+	if(已上翻){
+		段数++
+		已上翻:=0
+	}
+	显示字串:=阅读字串(段数)
+	ControlSetText, %阅读显示%, %显示字串% , 单行阅读器_按ESC退出 
 	段数++
-	已上翻:=0
-}
-显示字串:=阅读字串(段数)
-ControlSetText, %阅读显示%, %显示字串% , 单行阅读器_按esc退出 
-段数++
-已下翻:=1
+	已下翻:=1
 return
 
 向下测量:
@@ -194,13 +205,13 @@ return
 	return 获得字串
 }
 
-单行阅读器_按esc退出GuiClose:								;终于解决这个老大难问题,ahk还是高科技的
+单行阅读器_按ESC退出GuiClose:								;终于解决这个老大难问题,ahk还是高科技的
 gosub,退出
 return
 
-单行阅读器_按esc退出GuiSize:								;背景窗口最小化事件
+单行阅读器_按ESC退出GuiSize:								;背景窗口最小化事件
 if (errorlevel==1){
-;	WinHide,单行阅读器
+;	WinHide,单行阅读器_按ESC退出
 	是否开启鼠标监测(0)
 }else if(errorlevel==2){
 	if (已最小化){
@@ -209,8 +220,8 @@ if (errorlevel==1){
 	}
 	是否开启鼠标监测(开启监测)
 	mousemove,% A_ScreenWidth*0.4,% 鼠标位移上线,
-;	WinShow,单行阅读器
-	winactivate,单行阅读器_按esc退出
+;	WinShow,单行阅读器_按ESC退出
+	winactivate,单行阅读器_按ESC退出
 }
 return
 
