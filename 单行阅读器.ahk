@@ -1,4 +1,5 @@
 ﻿#singleinstance force
+Menu, Tray, Icon ,icon.ico
 CoordMode,mouse,screen
 try{
 	FileSelectFile,书籍路径
@@ -24,13 +25,13 @@ fileread, 内存文件 , %书籍路径%
 空字符:=" 　`r`n`t"
 显示字串:=""
 
-阅读位置:=[]
-阅读位置[段数] := 标点位置:=段数:=指针:=1
-
+阅读位置:={}
+标点位置:=段数:=指针:=1
 IniRead, 读取的位置, 阅读文件.ini, 阅读位置, % 书籍路径, 1
-if(读取的位置){
+
+if(读取的位置!="error"){
 	阅读位置[1] :=读取的位置
-}
+}else 阅读位置[1]:=1
 
 显示窗口:
 
@@ -112,8 +113,8 @@ return
 上翻页:
 	if(!内存文件)
 		return
-	if(段数>1){
-		if(已下翻){
+	if(阅读位置[段数-1]){
+		if(阅读位置[段数-2]){
 			段数-=2
 			已下翻:=0
 		}else 段数--
